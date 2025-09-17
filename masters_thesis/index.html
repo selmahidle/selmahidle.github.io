@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selma Hidle | Master's Thesis: Development of a Fully Automated Pipeline for Ki-67 Proliferation Analysis Heading</title>
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    <header>
+        <h3>Selma Hidle &emsp; | &emsp; Master's Thesis</h3>
+        <h1>Development of a Fully Automated Pipeline for Ki-67 Proliferation Analysis</h2>
+        <h2>Index Calculation and Hotspot Localization from Whole Slide Images of Breast Cancer Biopsies</h2>
+    </header>
+
+    <section class="container">
+        <p>
+            This page provides a brief overview of my master's thesis. It summarizes the main ideas at a high level and highlights the 
+            skills and knowledge I developed throughout the project.
+            <br><br>
+            The thesis was written as part of the Computer Science program at the Norwegian University of Science and Technology (NTNU)
+            during the spring semester of 2025. It was supervised by Gabriel Hanssen Kiss and Frank Lindseth from the Department 
+            of Computer Science, as well as by Henrik Sahlin Petterson from the Department of Clinical and Molecular Medicine. Their 
+            feedback and guidance were very valuable and helped improve the quality of the work. The thesis received the grade A, 
+            and the full report is available upon request.
+        </p>
+    </section>
+    
+
+    <section id="introduction" class="container">
+        <h3>Introduction</h3>
+        <p>
+            The main goal of the thesis was to develop a fully automated system to measure the ratio of dividing cancer cells amongst 
+            all cancer cells, and to identify the areas with the highest proliferation index in breast cancer biopsy images.
+
+            <br><br>
+
+            Breast cancer is the most common cancer among women, and accurate diagnosis is crucial for choosing the right treatment. 
+            An important part of of the diagnostic process involves measuring how quickly the tumor cells are dividing, often evaluated 
+            based on the presence of the Ki-67 protein. However, manually assessing tissue samples introduces practical and diagnostic 
+            challenges. The analysis is time-consuming, depends on subjective judgment, and is becoming harder to 
+            sustain due to increasing workloads and a shortage of trained pathologists. Automating this step could make the process 
+            faster and more consistent, while maintaining the accuracy expected from expert pathologists.
+        </p>
+    </section>
+  
+    <section id="methodology" class="container">
+        <h3>Methodology</h3>
+
+        <p>
+            The pipeline analyses the biopsy image in five main steps. The top-left image in the figure below represents the original 
+            input, and the five images that follow illustrate each step of the analysis described below.
+        </p>
+
+        <img src="img/pipeline_overview.png" alt="Pipeline Overview" width=100%>
+
+        <ol id="methodology_list">
+            <li>
+                <b>Tissue Segmentation &emsp;</b> 
+                
+                This is the first stage after preprocessing. Its primary purpose is to remove the background from the 
+                image, reducing computational cost for subsequent steps. Seeing as the tissue has more texture than the background, 
+                they can be separated based on their entropy values. A thresholding algorithm determines the value that best separates tissue from 
+                background. The output is a binary tissue mask, which then determines whether or not image patches are passed to the 
+                next stage.
+            </li>
+
+            <li>
+                <b>Tumor Segmentation &emsp;</b> 
+                
+                The primary purpose of this stage is to delineate cancerous regions within the tissue areas, and again to 
+                reduce the computational load for the next stage. Four different deep learning models were trained and tested with different 
+                configurations, and the one that obtained the best Dice score on the test set was used in the final pipeline. The output 
+                from this stage is a binary tumor mask.
+            </li>
+
+            <li>
+                <b>Tumor Cell Segmentation &emsp;</b> 
+                
+                Within the previously identified tumor regions, this stage focuses on detecting tumor cells. The primary 
+                purpose is to create a mask indicating tumor cell locations, which is later used to identify the initial hotspot candidates. 
+                As in the previous stage, four deep learning models were trained and tested with different configuration, and the one that
+                achieved the highest Dice score on the test set was used in the final pipeline. The output is a binary tumor cell mask.
+            </li>
+
+            <li>
+                <b>Initial Hotspot Candidate Selection &emsp;</b> 
+                
+                In this stage, the tumor cell mask is used to identify initial hotspot candidates based on Ki-67 positivity. Ki-67 positive 
+                cells are recognized by their brown staining, which contrasts with the blue staining of Ki-67 negative cells. Color 
+                deconvolution produces an intensity map that highlights staining differences, and this intensity map is combined with the 
+                tumor cell mask to pinpoint regions with a high density of dual-positive values (cells that are both tumor cells and Ki-67 
+                positive). The output is a list of image patches containing the coordinates of candidate hotspots.
+            </li>
+
+            <li>
+                <b>Hotspot Refinement and Cell Counting &emsp;</b> 
+                
+                Finally, the initial hotspot candidates are refined using a more accurate cell detection method. A pre-trained deep learning 
+                model called StarDist is applied to segment and count individual cells in each patch. Non-tumor cells are removed using the 
+                tumor cell mask from stage 3. The remaining tumor cells are then classified as Ki-67 positive or negative based on staining 
+                intensity. Using these refined counts, the top N hotspots are re-ranked, while also making sure that the total number of cells 
+                in each hotspot falls within a range consistent with clinical practice.
+            </li>
+        </ol>
+
+        <h4>Tech Stack</h4>
+        <p>
+            The project is implemented in Python, with the following main libraries and tools:
+        </p>
+        <ul>
+            <li><b>OpenSlide:</b> used to read and process digitized tissue slide images.</li>
+            <li><b>PyTorch:</b> served as the core deep learning framework, used to train and test the models.</li>
+            <li><b>Segmentation Models PyTorch:</b> provides implementations of popular segmentation models.</li>
+            <li><b>MONAI (Medical Open Network for AI):</b> offers model implementations, preprocessing tools, and evaluation metrics, 
+            developed for medical image computing.</li>
+            <li><b>StarDist:</b> is an open source deep learning model for segmentation of cells in microscopy images, used for accurate 
+                cell segmentation.</li>
+            <li><b>Weights & Biases (wandb):</b> used to track experiments and visualize training progress.</li>
+            <li><b>Git:</b> used for version control and managing code changes.</li>
+
+        </ul>
+    </section>
+
+    <section id="results" class="container">
+        <h3>Results</h3>
+        <p>
+
+            The first experiments aimed to identify the best model for tumor region segmentation, followed by tumor cell segmentation. 
+            Then, some of the hyperparameters were tuned to improve performance. The complete pipeline was tested on seven samples,  
+            the results were reviewed, and adjustments were made before running the final experiment with the improved pipeline.
+
+            <br><br>
+
+            The final experiment shows that the pipeline accurately localizes hotspots but tends to underestimate the proliferation index. 
+            All hotspots are correctly located within tumor regions, and for all samples except one, they align with pathologist annotations. 
+            Predicted counts are closer to the pathologists measurements than in the first experiments, with a mean underestimation of 4.9 
+            percentage points. Some weakly stained positive cells were still misclassified as negative, and not all tumor cells were successfully segmented 
+            in the final analysis. The figure below shows the pathologist's hotspot markings in the top image and the pipeline's output in 
+            the bottom image. The pipeline's proliferation index of 16.5% is consistent with the pathologists' assessments of 18% 
+            and 21%.
+        </p>
+
+        <div style="text-align: center;">
+            <img src="img/ex_res.png" alt="Pipeline Output Example" width="80%">
+        </div>
+
+    </section>
+
+    <section id="conclusion" class="container">
+    <h3>Conclusion & Future Work</h3>
+        <p>
+            This thesis demonstrates the feasibility of a fully automated pipeline for Ki-67 analysis by implementing an end-to-end 
+            proof-of-concept system. The pipeline can process entire slides and accurately locate hotspot regions similar to a pathologist. 
+            However, two main limitations remain: it consistently underestimates the proliferation index, and it was only tested on a 
+            small set of slides from a single institution. To address these issues, algorithmic improvements such as dynamic stain intensity 
+            thresholding could help ensure more Ki-67 positive cells are correctly identified, and the pipeline should be evaluated on a 
+            larger, more diverse set of slides to confirm its reliability before clinical use.
+        </p>
+
+
+    </section>
+
+
+
+
+    <footer>
+        <div class="container">
+            <p> Selma Hidle &copy; <span id="year"></span>  | Email: <a href="mailto:selma.hidle@gmail.com">selma.hidle@gmail.com</a></p>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById("year").innerText = new Date().getFullYear();
+    </script>
+</body>
+</html>
