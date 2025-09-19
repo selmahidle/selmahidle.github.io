@@ -53,7 +53,7 @@
         <h3>Methodology</h3>
 
         <p>
-            The pipeline analyses the biopsy image in five main steps. The top-left image in the figure below represents the original 
+            The biopsy images are analyzed in five main steps. The top-left image in the figure below represents the original 
             input, and the five images that follow illustrate each step of the analysis described below.
         </p>
 
@@ -67,18 +67,18 @@
                 
                 This is the first stage after preprocessing. Its primary purpose is to remove the background from the 
                 image, reducing computational cost for subsequent steps. Seeing as the tissue has more texture than the background, 
-                they can be separated based on their entropy values. A thresholding algorithm determines the value that best separates tissue from 
-                background. The output is a binary tissue mask, which then determines whether or not image patches are passed to the 
-                next stage.
+                they can be separated based on their entropy values. These entropy values are then used by a thresholding algorithm to 
+                set a threshold that optimally distinguishes tissue from background. The output is a binary tissue mask, which then 
+                determines whether or not image patches are passed to the next stage.
             </li>
 
             <li>
                 <b>Tumor Segmentation &emsp;</b> 
                 
-                The primary purpose of this stage is to delineate cancerous regions within the tissue areas, and again to 
+                The primary purpose of this stage is to segment cancerous regions within the tissue areas, and again to 
                 reduce the computational load for the next stage. Four different deep learning models were trained and tested with different 
-                configurations, and the one that obtained the best Dice score on the test set was used in the final pipeline. The output 
-                from this stage is a binary tumor mask.
+                configurations, and the one that obtained the best segmentation score on the test set was used in the final pipeline. The 
+                output from this stage is a binary tumor mask.
             </li>
 
             <li>
@@ -87,7 +87,7 @@
                 Within the previously identified tumor regions, this stage focuses on detecting tumor cells. The primary 
                 purpose is to create a mask indicating tumor cell locations, which is later used to identify the initial hotspot candidates. 
                 As in the previous stage, four deep learning models were trained and tested with different configuration, and the one that
-                achieved the highest Dice score on the test set was used in the final pipeline. The output is a binary tumor cell mask.
+                achieved the highest segmentation score on the test set was used in the final pipeline. The output is a binary tumor cell mask.
             </li>
 
             <li>
@@ -141,10 +141,10 @@
 
             The final experiment shows that the pipeline accurately localizes hotspots but tends to underestimate the proliferation index. 
             All hotspots are correctly located within tumor regions, and for all samples except one, they align with pathologist annotations. 
-            Predicted counts are closer to the pathologists measurements than in the first experiments, with a mean underestimation of 4.9 
+            Predicted counts are closely aligned with the pathologists measurements, with a mean underestimation of 4.9 
             percentage points. Some weakly stained positive cells were still misclassified as negative, and not all tumor cells were successfully segmented 
             in the final analysis. The figure below shows the pathologist's hotspot markings in the top image and the pipeline's output in 
-            the bottom image. The pipeline's proliferation index of 16.5% is consistent with the pathologists' assessments of 18% 
+            the bottom image. The pipeline's proliferation index of 16.5% can be considered consistent with the pathologists' assessments of 18% 
             and 21%.
         </p>
 
