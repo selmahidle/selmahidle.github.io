@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Selma Hidle | Master's Thesis: Development of a Fully Automated Pipeline for Ki-67 Proliferation Analysis Heading</title>
+    <title>Selma Hidle | Master's Thesis</title>
     <link rel="stylesheet" href="index.css">
 </head>
 <body>
@@ -30,16 +30,21 @@
     <section id="introduction" class="container">
         <h3>Introduction</h3>
         <p>
-            The main goal of the thesis was to develop a fully automated system to measure the ratio of dividing cancer cells amongst 
-            all cancer cells, and to identify the areas with the highest proliferation index in breast cancer biopsy images.
+            The main goal of this thesis was to develop a fully automated system that calculates the 
+            proliferation index, which is the ratio of dividing (proliferating) cancer cells to the total 
+            number of cancer cells, and to use this information to identify the regions with the highest 
+            proliferation in breast cancer biopsy images.
 
             <br><br>
 
             Breast cancer is the most common cancer among women, and accurate diagnosis is crucial for choosing the right treatment. 
-            An important part of of the diagnostic process involves measuring how quickly the tumor cells are dividing, often evaluated 
-            based on the presence of the Ki-67 protein. However, manually assessing tissue samples introduces practical and diagnostic 
-            challenges. The analysis is time-consuming, depends on subjective judgment, and is becoming harder to 
-            sustain due to increasing workloads and a shortage of trained pathologists. Automating this step could make the process 
+            Measuring the proliferation index is an important part of the diagnostic process. In breast cancer, proliferating cells are 
+            usually identified by the Ki-67 protein.
+
+            <br><br>
+
+            However, manually assessing tissue samples introduces both practical and diagnostic challenges. The analysis is time-consuming, 
+            depends on subjective judgment, and is becoming harder to sustain due to increasing workloads and a shortage of trained pathologists. Automating this step could make the process 
             faster and more consistent, while maintaining the accuracy expected from expert pathologists.
         </p>
     </section>
@@ -52,7 +57,9 @@
             input, and the five images that follow illustrate each step of the analysis described below.
         </p>
 
-        <img src="img/pipeline_overview.png" alt="Pipeline Overview" width=100%>
+        <div style="text-align: center;">
+            <img src="img/pipeline_overview.png" alt="Pipeline Overview" width=90%>
+        </div>
 
         <ol id="methodology_list">
             <li>
@@ -142,7 +149,7 @@
         </p>
 
         <div style="text-align: center;">
-            <img src="img/ex_res.png" alt="Pipeline Output Example" width="80%">
+            <img src="img/ex_res.png" alt="Pipeline Output Example" width="70%">
         </div>
 
     </section>
